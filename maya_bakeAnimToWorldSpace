@@ -1,0 +1,23 @@
+# Make a locator that has world space animation of selected object
+import maya.cmds as cmds
+
+selectedObjects = cmds.ls(sl=True)
+
+# cycle through each selected object
+for i in selectedObjects:
+          # create a corresponding locator - named "loc_object_animBaked"
+          locatorName = str("loc_" + i + "_animBaked")
+          cmds.spaceLocator( n = locatorName)
+
+          # parent constrain locator to object with offset off
+          parentConstrainName = str(locatorName + "_parentConstrain")
+          cmds.parentConstraint(  i, locatorName, mo = 0, n = parentConstrainName )
+
+          # bake locator translate and rotation animation based on timeslider
+          #get Start and End Frame of Time Slider
+          startFrame = cmds.playbackOptions(q=True,minTime=True)
+          endFrame = cmds.playbackOptions(q=True,maxTime=True)
+          cmds.bakeResults( locatorName, t=(startFrame, endFrame))         
+
+          # delete parent constrain on locator       
+          cmds.delete(parentConstrainName)
